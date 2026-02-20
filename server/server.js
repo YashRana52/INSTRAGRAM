@@ -7,6 +7,10 @@ import userRouter from "./routes/userRoute.js";
 import postRouter from "./routes/postRoute.js";
 import messageRouter from "./routes/messageRoute.js";
 import { app, server } from "./socket/socket.js";
+import path from "path";
+
+const __dirname = path.resolve();
+console.log(__dirname);
 
 //middleware
 app.use(express.json());
@@ -22,19 +26,17 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.get("/", (req, res) => {
-  return res.status(200).json({
-    message: "I am coming from backend",
-    success: true,
-  });
-});
-
 const PORT = process.env.PORT || 4000;
 
 // API Routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/post", postRouter);
 app.use("/api/v1/message", messageRouter);
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
+app.use((req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
+});
 
 server.listen(PORT, () => {
   connectDB();
